@@ -1,0 +1,33 @@
+# vim: sw=2
+name: Lint
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  type-check:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tsc
+        run: npm install
+      - name: Run tsc
+        run: npm run typecheck
+
+  xo:
+    name: xo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tsc
+        run: npm install
+      - name: Run linters
+        run: npm run lint
