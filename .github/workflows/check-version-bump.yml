@@ -11,12 +11,71 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   check-version-bump:
     name: Check version bump
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
       - name: Check if version bumped
-        uses: del-systems/check-if-version-bumped@v2
+        id: version-check
+        continue-on-error: ${{startsWith(github.head_ref, 'dependabot/')}}
+        run: |
+          npm install --no-save semver
+          PREVIOUS_COMMIT="${{github.event.pull_request.base.sha || github.event.before}}"
+          git fetch origin "$PREVIOUS_COMMIT"
+          echo Comparing version bump against "$PREVIOUS_COMMIT"
+          DEFAULT_BRANCH_VERSION="$(git show "$PREVIOUS_COMMIT:package.json" | jq -r .version)"
+          CURRENT_BRANCH_VERSION="$(git show "HEAD:package.json" | jq -r .version)"
+          if npx semver -r "$CURRENT_BRANCH_VERSION" "$DEFAULT_BRANCH_VERSION"; then
+            echo "Error: No version bump detected (prev $DEFAULT_BRANCH_VERSION" current "$CURRENT_BRANCH_VERSION)."
+            exit 1
+          else
+            echo Version bump detected: "$DEFAULT_BRANCH_VERSION -> $CURRENT_BRANCH_VERSION"
+          fi
 
+      - name: Fetch Dependabot metadata
+        id: dependabot-metadata
+        if: steps.version-check.outcome == 'failure'
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Checkout code
+        if: steps.version-check.outcome == 'failure'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{github.head_ref}}
+
+      - name: Bump version
+        if: steps.version-check.outcome == 'failure'
+        run: |
+          BUMP_LEVEL="patch"
+          if [[ "${{ steps.dependabot-metadata.outputs.package-ecosystem }}" != "github_actions" && "${{ steps.dependabot-metadata.outputs.dependency-type }}" != "direct:development" ]]; then
+            BUMP_TYPE="${{ steps.dependabot-metadata.outputs.update-type }}"
+            BUMP_LEVEL="${BUMP_TYPE##*-}"
+          fi
+          echo "Bumping version by $BUMP_LEVEL"
+          npm version "$BUMP_LEVEL" --no-git-tag-version
+
+      - name: Commit changes
+        if: steps.version-check.outcome == 'failure'
+        run: |
+          git diff
+          git config --global user.name "Login will be determined by the Github API based on the creator of the token"
+          git config --global user.email ""
+          git commit -am '[dependabot-skip] Bump version'
+
+      - name: Push changes
+        if: steps.version-check.outcome == 'failure'
+        uses: Asana/push-signed-commits@v1
+        with:
+          github-token: ${{secrets.DEPENDABOT_GITHUB_TOKEN}}
+          local_branch_name: ${{github.head_ref}}
+          remote_branch_name: ${{github.head_ref}}
