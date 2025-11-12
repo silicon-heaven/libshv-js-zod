@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/*
+    schedule:
+      interval: weekly
+    groups:
+      github-actions-deps:
+        patterns:
+          - '*'
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm-dev-deps:
+        patterns:
+          - '*'
+        dependency-type: development
+      npm-prod-deps:
+        patterns:
+          - '*'
+        dependency-type: production
