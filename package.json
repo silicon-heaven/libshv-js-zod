@@ -29,7 +29,7 @@
     "./zod-ws-client": "./dist/zod-ws-client.js"
   },
   "dependencies": {
-    "libshv-js": "^7.0.10",
+    "libshv-js": "^7.0.14",
     "zod": "^4.3.6"
   },
   "devDependencies": {
