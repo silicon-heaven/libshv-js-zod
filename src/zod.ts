@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {z, type ZodType} from 'zod/v4';
-import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
+import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
 
-const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType<object>>(mapValidator: (val: unknown) => boolean, _mapBrand: MapBrand, mapName: string, objectParser: ObjectParser) => z.custom<z.infer<ObjectParser> & {[shvMapType]: MapBrand}>().check(ctx => {
+const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType<Record<string, unknown>>>(mapValidator: (val: unknown) => boolean, _mapBrand: MapBrand, mapName: string, objectParser: ObjectParser) => z.custom<z.infer<ObjectParser> & {[shvMapType]: MapBrand}>().check(ctx => {
     if (!mapValidator(ctx.value)) {
         ctx.issues.push({
             expected: 'map',
@@ -21,6 +21,7 @@ const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType
     const parsedObject = objectParser.safeParse(rest);
 
     if (!parsedObject.success) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         ctx.issues = parsedObject.error.issues as typeof ctx.issues;
     }
 });
@@ -73,6 +74,7 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData meta',
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
                 ...parsedMeta.error.issues as typeof ctx.issues,
             ];
             return;
@@ -87,6 +89,7 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData value',
                 },
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
                 ...parsedValue.error.issues as typeof ctx.issues,
             ];
         }
