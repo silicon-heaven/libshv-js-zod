@@ -2,21 +2,16 @@ import xo from "eslint-config-xo";
 import typescriptEslintParser from "@typescript-eslint/parser";
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import unicornPlugin from 'eslint-plugin-unicorn';
 
 export default tseslint.config(
     eslint.configs.recommended,
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
     ...tseslint.configs.stylisticTypeChecked,
-    unicornPlugin.configs.recommended,
-    ...xo,
+    ...xo(),
     {
         languageOptions: {
             parser: typescriptEslintParser,
-            parserOptions: {
-                project: "./tsconfig.json",
-            },
         },
         rules: {
             "@stylistic/function-paren-newline": ["off"],
@@ -70,6 +65,7 @@ export default tseslint.config(
             ],
             "@typescript-eslint/triple-slash-reference": "off",
             "capitalized-comments": "off",
+            "import-x/extensions": "off",
             "@stylistic/object-curly-newline": ["error", {
                 "ImportDeclaration": "never"
             }],
