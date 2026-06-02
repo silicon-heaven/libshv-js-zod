@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any -- maybe I'll get rid of them at some point */
 import {z, type ZodType} from 'zod/v4';
 import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
 
@@ -21,7 +21,6 @@ const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType
     const parsedObject = objectParser.safeParse(rest);
 
     if (!parsedObject.success) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         ctx.issues = parsedObject.error.issues as typeof ctx.issues;
     }
 });
@@ -74,7 +73,6 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData meta',
                 },
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
                 ...parsedMeta.error.issues as typeof ctx.issues,
             ];
             return;
@@ -89,7 +87,6 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData value',
                 },
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
                 ...parsedValue.error.issues as typeof ctx.issues,
             ];
         }
