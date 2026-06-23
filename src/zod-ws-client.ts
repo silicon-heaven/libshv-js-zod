@@ -10,6 +10,7 @@ const ErrorMapZod = z.imap({
 });
 
 const RpcRequestMetaZod = z.metamap({
+    // eslint-disable-next-line unicorn/max-nested-calls -- I think it's no big deal.
     [RPC_MESSAGE_CALLER_IDS]: z.int().or(z.array(z.int())).optional(),
     [RPC_MESSAGE_REQUEST_ID]: z.number(),
     [RPC_MESSAGE_METHOD]: z.string(),
@@ -24,6 +25,7 @@ const RpcRequestValueZod = z.imap({
 }));
 
 const RpcResponseMetaZod = z.metamap({
+    // eslint-disable-next-line unicorn/max-nested-calls -- I think it's no big deal.
     [RPC_MESSAGE_CALLER_IDS]: z.int().or(z.array(z.int())).optional(),
     [RPC_MESSAGE_REQUEST_ID]: z.number(),
 });

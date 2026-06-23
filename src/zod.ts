@@ -16,7 +16,7 @@ const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType
     // For record, Zod finds out map brand, and calls the record's value parser with the value. There's no way to detect
     // it, because Zod does not supply the parser with the key. To prevent this, remove the key before passing the value
     // to Zod. This unfortunately means that we need to copy the whole object. :/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars,unicorn/no-unreadable-object-destructuring
     const {[shvMapType]: zodMustNotHaveThis, ...rest} = {...ctx.value};
     const parsedObject = objectParser.safeParse(rest);
 
