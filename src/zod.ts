@@ -28,7 +28,8 @@ const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType
 export const map = <T extends Record<string, ZodType<any>>>(schema: T) => implMakeMapParser(isShvMap, 'map', 'ShvMap', z.object(schema));
 export const imap = <T extends Record<number, ZodType<any>>>(schema: T) => implMakeMapParser(isIMap, 'imap', 'IMap', z.object(schema));
 export const metamap = <T extends Record<string | number, ZodType<any>>>(schema: T) => implMakeMapParser(isMetaMap, 'metamap', 'MetaMap', z.object(schema));
-export const recmap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isShvMap(val) || isIMap(val), 'map', 'ShvMap', z.record(z.any(), schema));
+export const recmap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isShvMap(val), 'map', 'ShvMap', z.record(z.string(), schema));
+export const recimap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isIMap(val), 'imap', 'IMap', z.record(z.number(), schema));
 
 export const uint = () => z.instanceof(UInt<number>);
 export const double = () => z.instanceof(Double);
