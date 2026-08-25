@@ -50,6 +50,7 @@ export const rpcvalue: () => ZodType<RpcValue> = () => z.lazy(() => z.union([
     z.date(),
     list(),
     recmap(rpcvalue()),
+    recimap(rpcvalue()),
     withMetaInstanceParser,
 ]) as z.ZodType<RpcValue>);
 
