@@ -22,3 +22,4 @@ const SiteInfoZod = z.recmap(z.map({
 
 const lol = fromCpon(`{"key": {}}`);
 SiteInfoZod.parse(lol);
+z.rpcvalue().parse(makeIMap({}));
