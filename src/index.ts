@@ -1,2 +1,2 @@
-export * from './zod';
-export * from './zod-ws-client';
+export * from './zod.js';
+export * from './zod-ws-client.js';

@@ -1,6 +1,6 @@
 import { fromCpon } from 'libshv-js/cpon';
 import { makeIMap, makeMap, makeMetaMap } from 'libshv-js/rpcvalue';
-import * as z from '../src/zod';
+import * as z from '../src/zod.js';
 
 z.map({ ok: z.boolean(), })
 	.parse(makeMap({ok: true}))
