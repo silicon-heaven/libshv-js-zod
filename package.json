@@ -1,6 +1,6 @@
 {
   "name": "libshv-js-zod",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Zod validation support for libshv-js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "./zod-ws-client": "./dist/zod-ws-client.js"
   },
   "dependencies": {
-    "zod": "^4.3.6"
+    "zod": "^4.5.2"
   },
   "peerDependencies": {
     "libshv-js": "^8.0.0"

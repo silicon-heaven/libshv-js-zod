@@ -35,10 +35,11 @@ export const uint = () => z.instanceof(UInt<number>);
 export const double = () => z.instanceof(Double);
 export const decimal = () => z.instanceof(Decimal);
 export const blob = () => z.instanceof(ArrayBuffer);
-export const list: () => z.ZodArray<z.ZodLazy<z.ZodType<RpcValue>>> = () => z.array(z.lazy<z.ZodType<RpcValue>>(rpcvalue));
+export const list = () => z.array(rpcvalueSchema);
 
 const withMetaInstanceParser = z.instanceof(RpcValueWithMetaData);
-export const rpcvalue: () => ZodType<RpcValue> = () => z.lazy(() => z.union([
+const rpcvalueSchema = z.lazy(() => rpcvalue());
+export const rpcvalue = (): ZodType<RpcValue> => z.union([
     z.undefined(),
     z.boolean(),
     z.number(),
@@ -49,10 +50,10 @@ export const rpcvalue: () => ZodType<RpcValue> = () => z.lazy(() => z.union([
     z.string(),
     z.date(),
     list(),
-    recmap(rpcvalue()),
-    recimap(rpcvalue()),
+    recmap(rpcvalueSchema),
+    recimap(rpcvalueSchema),
     withMetaInstanceParser,
-]) as z.ZodType<RpcValue>);
+]);
 
 export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValueType>(metaParser: ZodType<MetaSchema>, valueParser: ZodType<ValueSchema>) =>
     z.custom<RpcValueWithMetaData<z.infer<typeof metaParser>, z.infer<typeof valueParser>>>().check(ctx => {
