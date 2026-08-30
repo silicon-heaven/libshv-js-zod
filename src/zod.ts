@@ -1,35 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- maybe I'll get rid of them at some point */
-import {z, type ZodType} from 'zod/v4';
-import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
+import {z, type ZodRawShape, type ZodType} from 'zod/v4';
+import {Decimal, Double, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, UInt} from 'libshv-js/rpcvalue';
 
-const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType<Record<string, unknown>>>(mapValidator: (val: unknown) => boolean, _mapBrand: MapBrand, mapName: string, objectParser: ObjectParser) => z.custom<z.infer<ObjectParser> & {[shvMapType]: MapBrand}>().check(ctx => {
-    if (!mapValidator(ctx.value)) {
-        ctx.issues.push({
-            expected: 'map',
-            code: 'invalid_type',
-            input: ctx.value,
-            message: `Invalid input: expected ${mapName}, received ${typeName(ctx.value)}`,
-        });
-        return;
-    }
-
-    // For record, Zod finds out map brand, and calls the record's value parser with the value. There's no way to detect
-    // it, because Zod does not supply the parser with the key. To prevent this, remove the key before passing the value
-    // to Zod. This unfortunately means that we need to copy the whole object. :/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {[shvMapType]: zodMustNotHaveThis, ...rest} = {...ctx.value};
-    const parsedObject = objectParser.safeParse(rest);
-
-    if (!parsedObject.success) {
-        ctx.issues = parsedObject.error.issues as typeof ctx.issues;
-    }
-});
-
-export const map = <T extends Record<string, ZodType<any>>>(schema: T) => implMakeMapParser(isShvMap, 'map', 'ShvMap', z.object(schema));
-export const imap = <T extends Record<number, ZodType<any>>>(schema: T) => implMakeMapParser(isIMap, 'imap', 'IMap', z.object(schema));
-export const metamap = <T extends Record<string | number, ZodType<any>>>(schema: T) => implMakeMapParser(isMetaMap, 'metamap', 'MetaMap', z.object(schema));
-export const recmap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isShvMap(val), 'map', 'ShvMap', z.record(z.string(), schema));
-export const recimap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isIMap(val), 'imap', 'IMap', z.record(z.number(), schema));
+export const map = <T extends ZodRawShape>(schema: T) => z.object({...schema, [shvMapType]: z.literal('map')});
+export const imap = <T extends ZodRawShape>(schema: T) => z.object({...schema, [shvMapType]: z.literal('imap')});
+export const metamap = <T extends ZodRawShape>(schema: T) => z.object({...schema, [shvMapType]: z.literal('metamap')});
+export const recmap = <T extends ZodType<RpcValue>>(schema: T) => z.record(z.string(), schema).and(map({}));
+export const recimap = <T extends ZodType<RpcValue>>(schema: T) => z.record(z.number(), schema).and(imap({}));
 
 export const uint = () => z.instanceof(UInt<number>);
 export const double = () => z.instanceof(Double);
