@@ -31,11 +31,11 @@ const RpcResponseMetaZod = z.metamap({
 });
 
 const RpcResponseValueZod = z.imap({
-    [RPC_MESSAGE_RESULT]: z.rpcvalue(),
-}).or(z.imap({
     [RPC_MESSAGE_ERROR]: ErrorMapZod,
-})).or(z.imap({
+}).or(z.imap({
     [RPC_MESSAGE_DELAY]: z.double(),
+})).or(z.imap({
+    [RPC_MESSAGE_RESULT]: z.rpcvalue().optional(),
 }));
 
 const RpcSignalMetaZod = z.metamap({
@@ -61,12 +61,13 @@ export type ZodMethodHandler = {
 
 function createZodWsClient(options: WsClientOptions<ZodMethodHandler>): WsClient {
     const parseMessage = (rpcVal: RpcValue): z.infer<typeof RpcMessageZod> => {
-        try {
-            return RpcMessageZod.parse(rpcVal);
-        } catch (error) {
-            console.error('RPC Message validation failed:', error);
-            throw error;
+        const msg = RpcMessageZod.safeParse(rpcVal);
+        if (!msg.success) {
+            console.error('RPC Message validation failed:', z.treeifyError(msg.error));
+            throw msg.error;
         }
+
+        return msg.data;
     };
 
     const convertedOptions = 'login' in options ? {
