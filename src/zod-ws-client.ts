@@ -61,12 +61,13 @@ export type ZodMethodHandler = {
 
 function createZodWsClient(options: WsClientOptions<ZodMethodHandler>): WsClient {
     const parseMessage = (rpcVal: RpcValue): z.infer<typeof RpcMessageZod> => {
-        try {
-            return RpcMessageZod.parse(rpcVal);
-        } catch (error) {
-            console.error('RPC Message validation failed:', error);
-            throw error;
+        const msg = RpcMessageZod.safeParse(rpcVal);
+        if (!msg.success) {
+            console.error('RPC Message validation failed:', z.treeifyError(msg.error));
+            throw msg.error;
         }
+
+        return msg.data;
     };
 
     const convertedOptions = 'login' in options ? {
