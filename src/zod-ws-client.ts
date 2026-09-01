@@ -31,11 +31,11 @@ const RpcResponseMetaZod = z.metamap({
 });
 
 const RpcResponseValueZod = z.imap({
-    [RPC_MESSAGE_RESULT]: z.rpcvalue(),
-}).or(z.imap({
     [RPC_MESSAGE_ERROR]: ErrorMapZod,
-})).or(z.imap({
+}).or(z.imap({
     [RPC_MESSAGE_DELAY]: z.double(),
+})).or(z.imap({
+    [RPC_MESSAGE_RESULT]: z.rpcvalue().optional(),
 }));
 
 const RpcSignalMetaZod = z.metamap({

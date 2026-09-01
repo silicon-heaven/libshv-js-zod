@@ -33,7 +33,7 @@
     "zod": "^4.5.2"
   },
   "peerDependencies": {
-    "libshv-js": "^8.0.0"
+    "libshv-js": "^9.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
