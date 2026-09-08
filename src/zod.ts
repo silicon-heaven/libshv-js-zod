@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- maybe I'll get rid of them at some point */
 import {z, type ZodType} from 'zod/v4';
 import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
 
@@ -25,11 +24,11 @@ const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType
     }
 });
 
-export const map = <T extends Record<string, ZodType<any>>>(schema: T) => implMakeMapParser(isShvMap, 'map', 'ShvMap', z.object(schema));
-export const imap = <T extends Record<number, ZodType<any>>>(schema: T) => implMakeMapParser(isIMap, 'imap', 'IMap', z.object(schema));
-export const metamap = <T extends Record<string | number, ZodType<any>>>(schema: T) => implMakeMapParser(isMetaMap, 'metamap', 'MetaMap', z.object(schema));
-export const recmap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isShvMap(val), 'map', 'ShvMap', z.record(z.string(), schema));
-export const recimap = <T extends ZodType<any>>(schema: T) => implMakeMapParser(val => isIMap(val), 'imap', 'IMap', z.record(z.number(), schema));
+export const map = <T extends Record<string, ZodType<RpcValue>>>(schema: T) => implMakeMapParser(isShvMap, 'map', 'ShvMap', z.object(schema));
+export const imap = <T extends Record<number, ZodType<RpcValue>>>(schema: T) => implMakeMapParser(isIMap, 'imap', 'IMap', z.object(schema));
+export const metamap = <T extends Record<string | number, ZodType<RpcValue>>>(schema: T) => implMakeMapParser(isMetaMap, 'metamap', 'MetaMap', z.object(schema));
+export const recmap = <T extends ZodType<RpcValue>>(schema: T) => implMakeMapParser(val => isShvMap(val), 'map', 'ShvMap', z.record(z.string(), schema));
+export const recimap = <T extends ZodType<RpcValue>>(schema: T) => implMakeMapParser(val => isIMap(val), 'imap', 'IMap', z.record(z.number(), schema));
 
 export const uint = () => z.instanceof(UInt<number>);
 export const double = () => z.instanceof(Double);
