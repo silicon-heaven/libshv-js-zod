@@ -66,9 +66,6 @@ export default tseslint.config(
             "@typescript-eslint/triple-slash-reference": "off",
             "capitalized-comments": "off",
             "import-x/extensions": "off",
-            "@stylistic/object-curly-newline": ["error", {
-                "ImportDeclaration": "never"
-            }],
             "n/file-extension-in-import": "off",
             "promise-function-async": "off",
             "camelcase": "off",

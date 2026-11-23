@@ -1,5 +1,18 @@
 import {z, type ZodType} from 'zod/v4';
-import {Decimal, Double, isIMap, isMetaMap, isShvMap, type MetaMap, type RpcValue, type RpcValueType, RpcValueWithMetaData, shvMapType, typeName, UInt} from 'libshv-js/rpcvalue';
+import {
+    Decimal,
+    Double,
+    isIMap,
+    isMetaMap,
+    isShvMap,
+    type MetaMap,
+    type RpcValue,
+    type RpcValueType,
+    RpcValueWithMetaData,
+    shvMapType,
+    typeName,
+    UInt,
+} from 'libshv-js/rpcvalue';
 
 const implMakeMapParser = <MapBrand extends string, ObjectParser extends ZodType<Record<string, unknown>>>(mapValidator: (val: unknown) => boolean, _mapBrand: MapBrand, mapName: string, objectParser: ObjectParser) => z.custom<z.infer<ObjectParser> & {[shvMapType]: MapBrand}>().check(ctx => {
     if (!mapValidator(ctx.value)) {
@@ -75,7 +88,7 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData meta',
                 },
-                ...parsedMeta.error.issues as typeof ctx.issues,
+                ...(parsedMeta.error.issues as typeof ctx.issues),
             ];
             return;
         }
@@ -89,7 +102,7 @@ export const withMeta = <MetaSchema extends MetaMap, ValueSchema extends RpcValu
                     input: ctx.value,
                     message: 'Wrong RpcValueWithMetaData value',
                 },
-                ...parsedValue.error.issues as typeof ctx.issues,
+                ...(parsedValue.error.issues as typeof ctx.issues),
             ];
         }
     });
